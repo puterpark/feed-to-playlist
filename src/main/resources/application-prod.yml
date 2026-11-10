@@ -36,6 +36,9 @@ logging:
       max-file-size: 20MB
 
 feed:
+  site:
+    # 개인정보처리방침·약관에 표시되는 문의 이메일
+    contact-email: ${CONTACT_EMAIL:}
   google:
     # Google Cloud Console > OAuth 클라이언트(웹 애플리케이션)
     client-id: ${GOOGLE_CLIENT_ID:}

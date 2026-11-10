@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('서비스 약관')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main class="wrap">
+  <h1>서비스 약관</h1>
+  <p class="meta">시행일: <span th:text="${site.effectiveDate}">2026-11-11</span></p>
+
+  <h2>1. 목적과 동의</h2>
+  <p>
+    이 약관은 <strong th:text="${site.name}">Feed to Playlist</strong>(이하 "서비스")의 이용 조건을 정합니다.
+    Google 계정을 연결하여 서비스를 이용하면 이 약관과
+    <a th:href="@{/privacy}">개인정보처리방침</a>에 동의한 것으로 봅니다. 동의하지 않으면 서비스를 이용하지 마세요.
+  </p>
+
+  <h2>2. 서비스 내용</h2>
+  <p>
+    서비스는 이용자가 구독한 YouTube 채널의 새 영상을 확인하여, 이용자의 YouTube 계정에 있는 재생목록에 자동으로 추가합니다.
+    이를 위해 이용자가 허용한 범위에서 YouTube 구독 목록을 읽고 재생목록을 생성·수정합니다.
+  </p>
+
+  <h2>3. 이용자의 의무</h2>
+  <ul>
+    <li>만 14세 이상이어야 하며, 본인 소유의 Google 계정만 연결해야 합니다.</li>
+    <li>서비스를 비정상적으로 이용하거나, 서비스·Google·YouTube 의 시스템에 부담을 주거나 방해하는 행위를 해서는 안 됩니다.</li>
+    <li>
+      <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube 서비스 약관</a>을 비롯해 관련 법령과 약관을 준수해야 합니다.
+    </li>
+  </ul>
+
+  <h2>4. 서비스의 제공과 변경</h2>
+  <ul>
+    <li>서비스는 YouTube 의 RSS 피드와 YouTube Data API 에 의존합니다. API 쿼터, 정책 변경, 장애 등으로 일부 영상이 지연되거나 누락될 수 있습니다.</li>
+    <li>서비스는 기능을 변경하거나 중단·종료할 수 있으며, 종료 등 이용자에게 중대한 영향이 있는 경우에는 최소 7일 전에 이 페이지에 공지합니다. 다만 긴급한 장애 대응이나 천재지변 등 불가피한 경우에는 사후에 공지할 수 있습니다.</li>
+    <li>서비스는 무료로 제공되며 가용성, 정확성, 특정 목적에의 적합성을 보증하지 않습니다.</li>
+  </ul>
+
+  <h2>5. 연결 해제</h2>
+  <p>
+    이용자는 언제든지
+    <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google 계정 권한 관리</a>에서
+    서비스의 접근 권한을 삭제하여 이용을 중단할 수 있습니다. 데이터 삭제 요청은 <a th:href="@{/privacy}">개인정보처리방침</a>의 절차를 따릅니다.
+    서비스는 이용자가 이 약관을 위반하거나 서비스 운영에 지장을 주는 경우 연결을 제한하거나 해제할 수 있습니다.
+  </p>
+
+  <h2>6. 면책</h2>
+  <p>
+    서비스는 "있는 그대로" 제공됩니다. 관련 법령이 허용하는 최대 범위에서, 서비스 이용 또는 이용 불가로 인해 발생한 손해
+    (재생목록 누락·중복, 서비스 중단, 데이터 손실 등)에 대해 책임을 지지 않습니다. 다만 고의 또는 중대한 과실이 있는 경우는 예외입니다.
+  </p>
+
+  <h2>7. 서드파티 서비스와의 관계</h2>
+  <p>
+    서비스는 Google 및 YouTube 와 제휴하거나 그들이 보증하는 서비스가 아닙니다. YouTube 와 Google 은 Google LLC 의 상표입니다.
+    서비스의 Google 사용자 데이터 이용은 <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API 서비스 사용자 데이터 정책</a>을 따릅니다.
+  </p>
+
+  <h2>8. 약관의 변경</h2>
+  <p>
+    약관을 변경하는 경우 시행일 7일 전부터 이 페이지에 공지하며, 이용자에게 불리한 변경은 시행일 30일 전부터 공지합니다.
+    변경된 약관에 동의하지 않는 이용자는 서비스 이용을 중단하고 연결을 해제할 수 있으며, 공지 후 시행일까지 거부 의사를 밝히지 않고 계속 이용하면 변경된 약관에 동의한 것으로 봅니다.
+  </p>
+
+  <h2>9. 준거법과 관할</h2>
+  <p>이 약관은 대한민국 법령에 따라 해석되고 적용됩니다. 서비스와 관련하여 분쟁이 발생하면 민사소송법에 따른 관할 법원에서 해결합니다.</p>
+
+  <h2>10. 운영자 및 문의처</h2>
+  <table>
+    <tr>
+      <th>운영자</th>
+      <td th:text="${site.operator}">Puter</td>
+    </tr>
+    <tr>
+      <th>이메일</th>
+      <td>
+        <a th:if="${!#strings.isEmpty(site.contactEmail)}" th:href="'mailto:' + ${site.contactEmail}" th:text="${site.contactEmail}">contact@example.com</a>
+      </td>
+    </tr>
+  </table>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

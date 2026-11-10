@@ -31,6 +31,9 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%15.15thread{15}] %cyan(%-40logger{40}:%line) - %msg%n"
 
 feed:
+  site:
+    # 개인정보처리방침·약관에 표시되는 문의 이메일
+    contact-email: ${CONTACT_EMAIL:}
   google:
     # Google Cloud Console > OAuth 클라이언트(웹 애플리케이션)
     client-id: ${GOOGLE_CLIENT_ID:}
