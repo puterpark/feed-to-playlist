@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: feed-to-playlist
+    version: 1.0.0
+
+  profiles:
+    active: local

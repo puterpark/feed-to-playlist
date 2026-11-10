@@ -1,0 +1,53 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+
+spring:
+  threads:
+    virtual:
+      enabled: true
+  config:
+    import: optional:file:./.env[.properties]
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${JDBC_URL:}
+    username: ${JDBC_USER:}
+    password: ${JDBC_PASSWORD:}
+  jooq:
+    sql-dialect: postgres
+
+logging:
+  level:
+    root: info
+    org.springframework.boot.SpringApplication: info
+    org.springframework.boot: error
+    org.springframework.web: error
+    org.springframework.security: error
+    org.jooq.tools.LoggerListener: debug
+    us.puter.feedtoplaylist: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%15.15thread{15}] %cyan(%-40logger{40}:%line) - %msg%n"
+
+feed:
+  google:
+    # Google Cloud Console > OAuth 클라이언트(웹 애플리케이션)
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    redirect-uri: ${GOOGLE_REDIRECT_URI:http://127.0.0.1:8080/oauth/google/callback}
+    # 비워두면 누구나 연결 가능. 지정하면 해당 이메일만 허용
+    allowed-emails: ${ALLOWED_EMAILS:}
+  security:
+    # refresh token 암호화 키: base64 인코딩된 32바이트 (예: openssl rand -base64 32)
+    token-key: ${TOKEN_ENCRYPTION_KEY:}
+  poll:
+    playlist-title: "구독 피드"
+    # 이 시간보다 오래된 영상은 새 영상으로 취급하지 않음
+    max-age: ${POLL_MAX_AGE:3d}
+    # 구독 채널 목록 재동기화 주기
+    subscription-sync-interval: ${POLL_SUBSCRIPTION_SYNC_INTERVAL:6h}
+    # RSS 동시 요청 수
+    rss-concurrency: ${POLL_RSS_CONCURRENCY:8}
+    # 쇼츠 제외 여부
+    skip-shorts: true

@@ -1,0 +1,127 @@
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.Paths
+
+plugins {
+  id 'java'
+  id 'org.springframework.boot' version '3.5.12'
+  id 'io.spring.dependency-management' version '1.1.7'
+  id 'org.jooq.jooq-codegen-gradle' version '3.20.7'
+}
+
+group = 'us.puter'
+version = '0.0.1-SNAPSHOT'
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
+}
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+sourceSets {
+  main {
+    java.srcDir("$projectDir/src/generated/jooq")
+  }
+}
+
+tasks.named('jooqCodegen') {
+  outputs.dir("$projectDir/src/generated/jooq")
+}
+
+bootJar {
+  archiveFileName = 'feed-to-playlist.jar'
+}
+
+dependencies {
+  // spring
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+  // db
+  implementation 'org.springframework.boot:spring-boot-starter-jooq'
+  runtimeOnly 'org.postgresql:postgresql'
+  jooqCodegen 'org.postgresql:postgresql:42.7.14'
+  implementation 'org.jooq:jooq:3.20.7'
+  implementation 'org.jooq:jooq-meta:3.20.7'
+  implementation 'org.jooq:jooq-codegen:3.20.7'
+
+  // util
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  implementation 'org.apache.commons:commons-lang3:3.20.0'
+  implementation 'com.github.f4b6a3:uuid-creator:6.1.1'
+
+  // test
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+}
+
+def JDBC_URL = System.getenv('JDBC_URL')
+def JDBC_USER = System.getenv('JDBC_USER')
+def JDBC_PASSWORD = System.getenv('JDBC_PASSWORD')
+
+jooq {
+  configuration {
+    jdbc {
+      driver = 'org.postgresql.Driver'
+      url = JDBC_URL
+      user = JDBC_USER
+      password = JDBC_PASSWORD
+    }
+    generator {
+      database {
+        name = 'org.jooq.meta.postgres.PostgresDatabase'
+        inputSchema = 'public'
+        forcedTypes {}
+      }
+      generate {
+        deprecated = false
+        records = true
+        immutablePojos = true
+        fluentSetters = true
+        daos = true
+        pojosAsJavaRecordClasses = true
+      }
+      target {
+        packageName = 'generated.jooq.obj'
+        directory = 'src/generated/jooq'
+      }
+    }
+  }
+}
+
+tasks.register('addLombokAnnotations') {
+  doLast {
+    fileTree('src/generated/jooq/generated/jooq/obj/tables/pojos').include('**/*.java').each { File file ->
+      String content = new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8)
+      def classPattern = ~/(\npublic record .*\()/
+      def matcher = classPattern.matcher(content)
+      if (matcher.find()) {
+        String modifiedContent = content.replaceAll(classPattern, "\n@lombok.Builder\$1")
+        Files.write(Paths.get(file.toURI()), modifiedContent.getBytes(StandardCharsets.UTF_8))
+      }
+    }
+  }
+}
+
+tasks.named('jooqCodegen').configure {
+  finalizedBy tasks.named('addLombokAnnotations')
+}
+
+tasks.named('compileJava') {
+  dependsOn tasks.named('jooqCodegen')
+}
