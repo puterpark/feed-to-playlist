@@ -54,6 +54,9 @@ header.site .wrap {
 }
 
 header.site .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 700;
   color: var(--fg);
   text-decoration: none;
@@ -140,6 +143,31 @@ th, td {
   vertical-align: top;
   padding: 8px 10px;
   border-bottom: 1px solid var(--line);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 좁은 화면: 셀을 세로로 쌓아 글자가 한 글자씩 꺾이지 않게 한다 */
+@media (max-width: 600px) {
+  table, tbody, tr, th, td {
+    display: block;
+    width: 100%;
+  }
+
+  /* 열 제목 행은 숨긴다 (각 셀이 위아래로 쌓이므로 불필요) */
+  tr:has(> th + th) {
+    display: none;
+  }
+
+  tr {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  th, td {
+    border-bottom: 0;
+    padding: 4px 10px;
+  }
 }
 
 th {
