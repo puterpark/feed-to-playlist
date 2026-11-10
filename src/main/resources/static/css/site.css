@@ -50,20 +50,31 @@ header.site .wrap {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  height: 56px;
+  min-height: 56px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 header.site .brand {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
   font-weight: 700;
   color: var(--fg);
   text-decoration: none;
 }
 
+header.site nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 14px;
+}
+
 header.site nav a {
-  margin-left: 16px;
+  white-space: nowrap;
   color: var(--muted);
   text-decoration: none;
   font-size: 0.95rem;
