@@ -59,3 +59,5 @@ feed:
     rss-concurrency: ${POLL_RSS_CONCURRENCY:8}
     # 쇼츠 제외 여부
     skip-shorts: true
+    # 라이브(예정/종료 포함)·프리미어 제외 여부
+    skip-live: true

@@ -9,9 +9,12 @@ import org.springframework.web.client.RestClientResponseException;
 import us.puter.feedtoplaylist.global.exception.GoogleApiException;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -105,6 +108,30 @@ public class YouTubeClient {
                 .body(request)
                 .retrieve()
                 .body(JsonNode.class));
+    }
+
+    /**
+     * 라이브 방송/예정/종료된 방송/프리미어(liveStreamingDetails 가 있는 영상)의 ID만 골라낸다. (쿼터: 50개당 1)
+     */
+    public Set<String> findLiveVideoIds(String accessToken, Collection<String> videoIds) {
+        Set<String> result = new HashSet<>();
+        List<String> ids = new ArrayList<>(videoIds);
+
+        for (int from = 0; from < ids.size(); from += 50) {
+            String joined = String.join(",", ids.subList(from, Math.min(from + 50, ids.size())));
+            JsonNode body = call(() -> restClient.get()
+                    .uri(BASE + "/videos?part=liveStreamingDetails&id={ids}&maxResults=50", joined)
+                    .headers(h -> h.setBearerAuth(accessToken))
+                    .retrieve()
+                    .body(JsonNode.class));
+            for (JsonNode item : body.path("items")) {
+                if (item.has("liveStreamingDetails")) {
+                    result.add(item.path("id").asText());
+                }
+            }
+        }
+
+        return result;
     }
 
     private JsonNode getPage(String accessToken, String path, Map<String, String> params, String pageToken) {

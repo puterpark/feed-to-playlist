@@ -16,7 +16,9 @@ public record PollProperties(
         @DefaultValue("8")
         int rssConcurrency,
         @DefaultValue("false")
-        boolean skipShorts
+        boolean skipShorts,
+        @DefaultValue("false")
+        boolean skipLive
 ) {
 
 }

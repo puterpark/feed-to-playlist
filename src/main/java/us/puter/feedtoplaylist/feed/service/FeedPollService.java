@@ -181,6 +181,17 @@ public class FeedPollService {
         // 오래된 영상부터 추가해야 재생목록 순서가 게시 시간순이 된다.
         candidates.sort(Comparator.comparing(c -> c.entry().publishedAt()));
 
+        Set<String> liveIds = Set.of();
+        if (properties.skipLive() && !candidates.isEmpty()) {
+            try {
+                liveIds = youTubeClient.findLiveVideoIds(accessToken,
+                        candidates.stream().map(c -> c.entry().videoId()).toList());
+            } catch (GoogleApiException e) {
+                // 판별 실패 시 라이브가 아닌 것으로 취급(fail-open)
+                log.warn("[{}] 라이브 판별 실패: {}", account.email(), e.getMessage());
+            }
+        }
+
         int added = 0;
         int skipped = 0;
         int failed = 0;
@@ -191,7 +202,8 @@ public class FeedPollService {
             int remaining = candidates.size() - i;
             String videoId = candidate.entry().videoId();
 
-            if (properties.skipShorts() && shortsDetector.isShort(videoId)) {
+            if (liveIds.contains(videoId)
+                    || (properties.skipShorts() && shortsDetector.isShort(videoId))) {
                 seenVideoRepository.markSeen(accountId, List.of(videoId));
                 skipped++;
                 continue;
