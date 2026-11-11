@@ -178,6 +178,8 @@ public class FeedPollService {
             }
         }
 
+        String email = account.email();
+
         // 오래된 영상부터 추가해야 재생목록 순서가 게시 시간순이 된다.
         candidates.sort(Comparator.comparing(c -> c.entry().publishedAt()));
 
@@ -188,7 +190,7 @@ public class FeedPollService {
                         candidates.stream().map(c -> c.entry().videoId()).toList());
             } catch (GoogleApiException e) {
                 // 판별 실패 시 라이브가 아닌 것으로 취급(fail-open)
-                log.warn("[{}] 라이브 판별 실패: {}", account.email(), e.getMessage());
+                log.warn("[{}] 라이브 판별 실패: {}", email, e.getMessage());
             }
         }
 
@@ -201,6 +203,7 @@ public class FeedPollService {
             // 이 영상부터 중단될 때 처리하지 못하고 남는 영상 수
             int remaining = candidates.size() - i;
             String videoId = candidate.entry().videoId();
+            String title = candidate.entry().title();
 
             if (liveIds.contains(videoId)
                     || (properties.skipShorts() && shortsDetector.isShort(videoId))) {
@@ -213,33 +216,33 @@ public class FeedPollService {
                 youTubeClient.addVideo(accessToken, playlistId, videoId);
                 seenVideoRepository.markSeen(accountId, List.of(videoId));
                 added++;
-                log.info("[{}] 추가: {} ({})", account.email(), candidate.entry().title(), videoId);
+                log.info("[{}] 추가: {} ({})", email, title, videoId);
             } catch (GoogleApiException e) {
                 if (e.isDuplicate() || e.isVideoNotFound()) {
                     // 이미 있거나 비공개/삭제된 영상: 재시도해도 의미 없으므로 처리 완료로 기록
                     seenVideoRepository.markSeen(accountId, List.of(videoId));
                     skipped++;
-                    log.debug("[{}] 건너뜀: {} - {}", account.email(), videoId, e.getMessage());
+                    log.info("[{}] 건너뜀: {} ({}) - {}", email, title, videoId, e.getMessage());
                 } else if (e.isQuotaExceeded()) {
-                    log.error("[{}] YouTube API 일일 쿼터 초과. 남은 영상은 다음 실행에서 처리합니다.", account.email());
+                    log.error("[{}] YouTube API 일일 쿼터 초과. 남은 영상은 다음 실행에서 처리합니다.", email);
                     failed += remaining;
                     break;
                 } else if (e.isPlaylistNotFound()) {
-                    log.error("[{}] 재생목록이 삭제되었습니다. 다음 실행에서 다시 생성합니다.", account.email());
+                    log.error("[{}] 재생목록이 삭제되었습니다. 다음 실행에서 다시 생성합니다.", email);
                     accountRepository.updatePlaylistId(accountId, null);
                     failed += remaining;
                     break;
                 } else if (e.isPlaylistFull()) {
-                    log.error("[{}] 재생목록이 가득 찼습니다(최대 5000개). 정리가 필요합니다.", account.email());
+                    log.error("[{}] 재생목록이 가득 찼습니다(최대 5000개). 정리가 필요합니다.", email);
                     failed += remaining;
                     break;
                 } else if (e.isAuthError()) {
-                    log.error("[{}] 인증 오류. 다음 실행에서 토큰을 갱신합니다. - {}", account.email(), e.getMessage());
+                    log.error("[{}] 인증 오류. 다음 실행에서 토큰을 갱신합니다. - {}", email, e.getMessage());
                     failed += remaining;
                     break;
                 } else {
                     failed++;
-                    log.warn("[{}] 추가 실패(다음 실행에서 재시도): {} - {}", account.email(), videoId, e.getMessage());
+                    log.warn("[{}] 추가 실패(다음 실행에서 재시도): {} - {}", email, videoId, e.getMessage());
                 }
             }
         }
