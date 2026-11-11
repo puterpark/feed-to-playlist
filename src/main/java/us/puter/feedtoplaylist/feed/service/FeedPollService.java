@@ -133,7 +133,7 @@ public class FeedPollService {
                         result.put(sub.channelId(), rssFeedClient.fetch(sub.channelId()));
                     } catch (Exception e) {
                         // 해당 채널만 건너뛰고 다음 주기에 재시도
-                        log.warn("RSS 수집 실패: channel[{}] {} - {}", sub.channelId(), sub.title(), e.toString());
+                        log.warn("RSS 수집 실패: channel[{}] {} - {}", sub.channelId(), sub.title(), e.getMessage());
                     } finally {
                         semaphore.release();
                     }
