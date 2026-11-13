@@ -5,6 +5,7 @@ import generated.jooq.obj.tables.pojos.Subscription;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import us.puter.feedtoplaylist.feed.client.RssFeedClient;
 import us.puter.feedtoplaylist.feed.client.ShortsDetector;
 import us.puter.feedtoplaylist.feed.model.FeedEntry;
@@ -244,6 +245,11 @@ public class FeedPollService {
                     failed++;
                     log.warn("[{}] 추가 실패(다음 실행에서 재시도): {} - {}", email, videoId, e.getMessage());
                 }
+            } catch (ResourceAccessException e) {
+                // 타임아웃 등 일시적 네트워크 오류: 남은 영상은 다음 실행에서 재시도
+                log.warn("[{}] YouTube API 네트워크 오류. 남은 영상은 다음 실행에서 처리합니다. - {}", email, e.getMessage());
+                failed += remaining;
+                break;
             }
         }
 
